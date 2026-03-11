@@ -44,7 +44,7 @@ app.use(
 );
 
 /* React fallback route */
-app.get("*", (req, res) => {
+app.get(/.*/, (req, res) => {
   res.sendFile(
     path.join(__dirnamePath, "../../frontend/dist/index.html")
   );
