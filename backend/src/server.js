@@ -20,11 +20,8 @@ app.use(
   })
 );
 
-/* ================= STRIPE WEBHOOK (BEFORE JSON PARSER) ================= */
-app.use(
-  "/api/billing/webhook",
-  express.raw({ type: "application/json" })
-);
+/* ================= STRIPE WEBHOOK ================= */
+app.use("/api/billing/webhook", express.raw({ type: "application/json" }));
 
 /* ================= JSON PARSER ================= */
 app.use(express.json());
@@ -36,32 +33,27 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/billing", billingRoutes);
 
-/* ================= FRONTEND (PRODUCTION) ================= */
+/* ================= FRONTEND ================= */
 const __dirnamePath = path.resolve();
 
-app.use(
-  express.static(path.join(__dirnamePath, "../../frontend/dist"))
-);
+app.use(express.static(path.join(__dirnamePath, "frontend/dist")));
 
-/* React fallback route */
 app.get(/.*/, (req, res) => {
-  res.sendFile(
-    path.join(__dirnamePath, "../../frontend/dist/index.html")
-  );
+  res.sendFile(path.join(__dirnamePath, "frontend/dist/index.html"));
 });
 
 /* ================= HEALTH CHECK ================= */
-app.get("/", (req, res) => {
+app.get("/health", (req, res) => {
   res.send("AI Hub Backend Running 🚀");
 });
 
-/* ================= DATABASE & SERVER ================= */
+/* ================= DATABASE ================= */
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB Connected ✅");
 
-    const PORT = process.env.PORT || 5000;
+    const PORT = process.env.PORT || 8080;
 
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT} 🚀`);
