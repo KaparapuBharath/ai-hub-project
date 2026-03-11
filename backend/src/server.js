@@ -1,7 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const path = require("path");
 require("dotenv").config();
 
 const authRoutes = require("./routes/authRoutes");
@@ -15,7 +14,7 @@ const app = express();
 /* ================= CORS ================= */
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: true, // allow all origins (works for Railway + localhost)
     credentials: true,
   })
 );
@@ -36,13 +35,6 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/billing", billingRoutes);
 
-/* ================= SERVE REACT BUILD ================= */
-app.use(express.static(path.join(process.cwd(), "frontend/dist")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(process.cwd(), "frontend/dist/index.html"));
-});
-
 /* ================= HEALTH CHECK ================= */
 app.get("/", (req, res) => {
   res.send("AI Hub Backend Running 🚀");
@@ -57,7 +49,7 @@ mongoose
     const PORT = process.env.PORT || 5000;
 
     app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT} 🚀`);
+      console.log(`Server running on port ${PORT} 🚀`);
     });
   })
   .catch((err) => {
