@@ -1,12 +1,12 @@
-import api from "./api";
+import API from "./api";
 
 const register = async (data) => {
-  const res = await api.post("/auth/register", data);
+  const res = await API.post("/auth/register", data);
   return res.data;
 };
 
 const login = async (data) => {
-  const res = await api.post("/auth/login", data);
+  const res = await API.post("/auth/login", data);
   return res.data;
 };
 

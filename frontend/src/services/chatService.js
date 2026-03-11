@@ -1,11 +1,11 @@
-import api from "./api";
+import API from "./api";
 
 export const sendMessage = async (message) => {
-  const res = await api.post("/chat", { message });
+  const res = await API.post("/chat", { message });
   return res.data;
 };
 
 export const getConversations = async () => {
-  const res = await api.get("/chat");
+  const res = await API.get("/chat");
   return res.data;
 };
