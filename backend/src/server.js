@@ -43,6 +43,7 @@ app.use(
   express.static(path.join(__dirnamePath, "../../frontend/dist"))
 );
 
+/* React fallback route */
 app.use((req, res) => {
   res.sendFile(
     path.join(__dirnamePath, "../../frontend/dist/index.html")
