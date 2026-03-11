@@ -43,7 +43,7 @@ app.use(
   express.static(path.join(__dirnamePath, "../../frontend/dist"))
 );
 
-app.get("/*", (req, res) => {
+app.use((req, res) => {
   res.sendFile(
     path.join(__dirnamePath, "../../frontend/dist/index.html")
   );
