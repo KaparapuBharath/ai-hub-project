@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const path = require("path");
 require("dotenv").config();
 
 const authRoutes = require("./routes/authRoutes");
@@ -34,6 +35,13 @@ app.use("/api/usage", usageRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/billing", billingRoutes);
+
+/* ================= SERVE REACT BUILD ================= */
+app.use(express.static(path.join(process.cwd(), "frontend/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "frontend/dist/index.html"));
+});
 
 /* ================= HEALTH CHECK ================= */
 app.get("/", (req, res) => {
