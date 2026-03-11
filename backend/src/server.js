@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const path = require("path");
 require("dotenv").config();
 
 const authRoutes = require("./routes/authRoutes");
@@ -14,7 +15,7 @@ const app = express();
 /* ================= CORS ================= */
 app.use(
   cors({
-    origin: true, // allow all origins (works for Railway + localhost)
+    origin: true,
     credentials: true,
   })
 );
@@ -34,6 +35,19 @@ app.use("/api/usage", usageRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/billing", billingRoutes);
+
+/* ================= FRONTEND (PRODUCTION) ================= */
+const __dirnamePath = path.resolve();
+
+app.use(
+  express.static(path.join(__dirnamePath, "../../frontend/dist"))
+);
+
+app.get("*", (req, res) => {
+  res.sendFile(
+    path.join(__dirnamePath, "../../frontend/dist/index.html")
+  );
+});
 
 /* ================= HEALTH CHECK ================= */
 app.get("/", (req, res) => {
