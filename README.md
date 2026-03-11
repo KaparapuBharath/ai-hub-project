@@ -110,7 +110,7 @@ npm run dev
 
 ## 👨‍💻 Author
 
-**Kaparapu Bharath Chandra**
+**Kaparapu Bharath**
 
 GitHub:
 https://github.com/KaparapuBharath
