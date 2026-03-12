@@ -1,7 +1,9 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: (import.meta.env.VITE_API_URL || "https://ai-hub-project-production-32fa.up.railway.app") + "/api",
+  baseURL:
+    import.meta.env.VITE_API_URL ||
+    "https://ai-hub-project-production-32fa.up.railway.app",
 });
 
 /* ================= ATTACH TOKEN ================= */
@@ -24,9 +26,6 @@ api.interceptors.response.use(
   (error) => {
     const token = localStorage.getItem("token");
 
-    // Only logout if:
-    // 1. Token exists
-    // 2. Backend explicitly says "Unauthorized"
     if (
       token &&
       error.response?.status === 401 &&
