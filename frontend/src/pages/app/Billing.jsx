@@ -17,7 +17,7 @@ function Billing() {
     try {
       const res = await api.get("/billing/subscription");
       setCurrentPlan(res.data.plan);
-    } catch (error) {
+    } catch {
       console.log("Subscription fetch skipped");
     }
   };
@@ -27,7 +27,7 @@ function Billing() {
     try {
       const res = await api.get("/auth/me");
       login(res.data);
-    } catch (err) {
+    } catch {
       console.log("User refresh skipped");
     }
   };
@@ -58,7 +58,7 @@ function Billing() {
       setLoadingPlan(plan);
       const res = await api.post("/billing/checkout", { plan });
       window.location.href = res.data.url;
-    } catch (error) {
+    } catch {
       console.error("Checkout failed");
       setLoadingPlan(null);
     }
@@ -84,7 +84,6 @@ function Billing() {
 
   return (
     <div className="p-10 text-white">
-
       {showSuccess && (
         <div className="bg-green-600 p-3 rounded mb-4">
           🎉 Payment successful! Your plan has been upgraded.

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY || "");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
@@ -31,7 +31,7 @@ const protect = async (req, res, next) => {
 };
 
 /* ===================================================== */
-/* 🚨 WEBHOOK MUST BE FIRST & USE RAW BODY               */
+/* WEBHOOK MUST BE FIRST                                 */
 /* ===================================================== */
 router.post(
   "/webhook",
@@ -47,11 +47,10 @@ router.post(
         process.env.STRIPE_WEBHOOK_SECRET
       );
     } catch (err) {
-      console.error("❌ Webhook signature verification failed:", err.message);
+      console.error("Webhook verification failed:", err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    /* ===== Handle Successful Checkout ===== */
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
 
@@ -67,7 +66,7 @@ router.post(
             user.subscriptionStatus = "active";
             await user.save();
 
-            console.log(`✅ User ${user.email} upgraded to ${plan}`);
+            console.log(`User ${user.email} upgraded to ${plan}`);
           }
         } catch (dbError) {
           console.error("Database update failed:", dbError.message);
@@ -94,6 +93,7 @@ router.get("/subscription", protect, async (req, res) => {
       usage: req.user.usage,
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Failed to fetch subscription" });
   }
 });
