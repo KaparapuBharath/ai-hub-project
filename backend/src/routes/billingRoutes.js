@@ -31,7 +31,7 @@ const protect = async (req, res, next) => {
 };
 
 /* ===================================================== */
-/* 🚨 IMPORTANT: WEBHOOK MUST BE FIRST & USE RAW BODY  */
+/* 🚨 WEBHOOK MUST BE FIRST & USE RAW BODY               */
 /* ===================================================== */
 router.post(
   "/webhook",
@@ -80,7 +80,7 @@ router.post(
 );
 
 /* ===================================================== */
-/* ✅ ENABLE JSON AFTER WEBHOOK (VERY IMPORTANT)        */
+/* ENABLE JSON AFTER WEBHOOK                             */
 /* ===================================================== */
 router.use(express.json());
 
@@ -115,20 +115,32 @@ router.post("/checkout", protect, async (req, res) => {
       return res.status(400).json({ message: "Invalid plan selected" });
     }
 
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error("Stripe secret key missing");
+      return res.status(500).json({ message: "Stripe not configured" });
+    }
+
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
       mode: "subscription",
+
       customer_email: req.user.email,
+
       line_items: [
         {
           price: selectedPrice,
           quantity: 1,
         },
       ],
+
       metadata: {
         userId: req.user._id.toString(),
         plan,
       },
+
+      automatic_payment_methods: {
+        enabled: true,
+      },
+
       success_url: `${process.env.CLIENT_URL}/app/billing?success=true`,
       cancel_url: `${process.env.CLIENT_URL}/app/billing?canceled=true`,
     });
@@ -136,8 +148,11 @@ router.post("/checkout", protect, async (req, res) => {
     res.json({ url: session.url });
 
   } catch (error) {
-    console.error("Stripe checkout error:", error.message);
-    res.status(500).json({ message: "Checkout session failed" });
+    console.error("Stripe checkout error:", error);
+    res.status(500).json({
+      message: "Checkout session failed",
+      error: error.message,
+    });
   }
 });
 
