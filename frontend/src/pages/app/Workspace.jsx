@@ -18,6 +18,10 @@ export default function Workspace() {
 
   const [cloudPos, setCloudPos] = useState({ top: 0, left: 0 });
 
+  const API_URL =
+    (import.meta.env.VITE_API_URL ||
+      "https://ai-hub-project-production-32fa.up.railway.app") + "/api/chat";
+
   const getSettings = () => {
     const saved = localStorage.getItem("aihub_settings");
     return saved ? JSON.parse(saved) : {};
@@ -81,7 +85,7 @@ export default function Workspace() {
 
       const token = localStorage.getItem("token");
 
-      const response = await fetch("http://localhost:5000/api/chat", {
+      const response = await fetch(API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -142,7 +146,6 @@ export default function Workspace() {
     if (saved) setHistory(JSON.parse(saved));
   }, []);
 
-  /* close cloud when clicking outside */
   useEffect(() => {
 
     const handler = (e) => {
@@ -168,7 +171,6 @@ export default function Workspace() {
 
       <div className="flex flex-col flex-1">
 
-        {/* Workspace Header */}
         <div className="px-10 pt-6">
 
           <button
@@ -182,7 +184,6 @@ export default function Workspace() {
 
         </div>
 
-        {/* Chat Messages */}
         <div className="px-10 pt-6 pb-40 space-y-8">
 
           {messages.map((msg, index) => (
@@ -228,7 +229,6 @@ export default function Workspace() {
 
       </div>
 
-      {/* Floating Cloud */}
       {showCloud && (
 
         <div
@@ -302,7 +302,6 @@ export default function Workspace() {
 
       )}
 
-      {/* Floating Chat Input */}
       <div className="fixed bottom-6 left-[320px] right-10">
 
         <div className="flex gap-4 bg-white/5 rounded-2xl p-3 backdrop-blur">
