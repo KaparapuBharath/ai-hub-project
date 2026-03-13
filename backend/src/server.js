@@ -26,6 +26,14 @@ app.use("/api/billing/webhook", express.raw({ type: "application/json" }));
 /* ================= JSON PARSER ================= */
 app.use(express.json());
 
+/* ================= FIX DOUBLE /api BUG ================= */
+app.use((req, res, next) => {
+  if (req.url.startsWith("/api/api")) {
+    req.url = req.url.replace("/api/api", "/api");
+  }
+  next();
+});
+
 /* ================= ROUTES ================= */
 app.use("/api/auth", authRoutes);
 app.use("/api/usage", usageRoutes);
