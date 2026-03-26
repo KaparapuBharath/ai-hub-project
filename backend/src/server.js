@@ -12,45 +12,10 @@ const conversationRoutes = require("./routes/conversationRoutes");
 
 const app = express();
 
-/* ================= FORCE CORS ================= */
-app.use((req, res, next) => {
-  const allowedOrigins = [
-    "https://ai-hub-project-production.up.railway.app",
-    "https://ai-hub-project-production-32fa.up.railway.app"
-  ];
-
-  const origin = req.headers.origin;
-
-  if (allowedOrigins.includes(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);
-  }
-
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
-
-  res.header("Access-Control-Allow-Credentials", "true");
-
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-
-  next();
-});
-
 /* ================= CORS ================= */
 app.use(
   cors({
-    origin: [
-      "https://ai-hub-project-production.up.railway.app",
-      "https://ai-hub-project-production-32fa.up.railway.app"
-    ],
+    origin: "https://ai-hub-project-production.up.railway.app",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -90,7 +55,7 @@ const __dirnamePath = path.resolve();
 
 app.use(express.static(path.join(__dirnamePath, "frontend/dist")));
 
-/* ❗ FIX: DO NOT HANDLE API ROUTES HERE */
+/* Serve frontend except API routes */
 app.get(/^(?!\/api).*/, (req, res) => {
   res.sendFile(path.join(__dirnamePath, "frontend/dist/index.html"));
 });

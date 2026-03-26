@@ -4,43 +4,11 @@ const Stripe = require("stripe");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-/* ================= STRIPE INIT (SAFE) ================= */
+/* ================= STRIPE INIT ================= */
 if (!process.env.STRIPE_SECRET_KEY) {
   console.error("❌ STRIPE_SECRET_KEY is missing in ENV");
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
-
-/* ================= FORCE CORS FOR BILLING ================= */
-router.use((req, res, next) => {
-  const allowedOrigins = [
-    "https://ai-hub-project-production.up.railway.app",
-    "https://ai-hub-project-production-32fa.up.railway.app"
-  ];
-
-  const origin = req.headers.origin;
-
-  if (allowedOrigins.includes(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);
-  }
-
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
-
-  res.header("Access-Control-Allow-Credentials", "true");
-
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-
-  next();
-});
 
 /* ================= AUTH MIDDLEWARE ================= */
 const protect = async (req, res, next) => {
@@ -69,7 +37,7 @@ const protect = async (req, res, next) => {
 };
 
 /* ===================================================== */
-/* WEBHOOK MUST BE FIRST                                 */
+/* WEBHOOK (MUST BE FIRST)                               */
 /* ===================================================== */
 router.post(
   "/webhook",
@@ -121,9 +89,7 @@ router.post(
   }
 );
 
-/* ===================================================== */
-/* ENABLE JSON AFTER WEBHOOK                             */
-/* ===================================================== */
+/* ================= ENABLE JSON AFTER WEBHOOK ================= */
 router.use(express.json());
 
 /* ================= GET SUBSCRIPTION ================= */
@@ -185,10 +151,6 @@ router.post("/checkout", protect, async (req, res) => {
       metadata: {
         userId: req.user._id.toString(),
         plan,
-      },
-
-      automatic_payment_methods: {
-        enabled: true,
       },
 
       success_url: `${process.env.CLIENT_URL}/app/billing?success=true`,
