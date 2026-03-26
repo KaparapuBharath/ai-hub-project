@@ -2,14 +2,18 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL:
-    (import.meta.env.VITE_API_URL ||
-      "https://ai-hub-project-production-32fa.up.railway.app") + "/api",
+    import.meta.env.VITE_API_URL ||
+    "https://ai-hub-project-production-32fa.up.railway.app/api",
+  withCredentials: true,
 });
 
 /* ================= ATTACH TOKEN ================= */
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
+
+    // 🔥 ensure headers object exists
+    config.headers = config.headers || {};
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
