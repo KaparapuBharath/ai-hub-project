@@ -1,16 +1,16 @@
 const Stripe = require("stripe");
 const User = require("../models/User");
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 
 exports.createCheckoutSession = async (req, res) => {
   try {
     const { plan } = req.body;
 
     const prices = {
-      go: 900,        // $9
-      pro: 2900,      // $29
-      proPlus: 7900,  // $79
+      go: 900,
+      pro: 2900,
+      proPlus: 7900,
     };
 
     if (!prices[plan]) {
@@ -20,6 +20,7 @@ exports.createCheckoutSession = async (req, res) => {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "subscription",
+
       line_items: [
         {
           price_data: {
@@ -33,8 +34,10 @@ exports.createCheckoutSession = async (req, res) => {
           quantity: 1,
         },
       ],
+
       success_url: `${process.env.CLIENT_URL}/app/billing?success=true`,
       cancel_url: `${process.env.CLIENT_URL}/app/billing?canceled=true`,
+
       metadata: {
         userId: req.user.id,
         plan,
@@ -44,13 +47,13 @@ exports.createCheckoutSession = async (req, res) => {
     res.json({ url: session.url });
 
   } catch (error) {
-    console.error(error);
+    console.error("Stripe checkout error:", error);
     res.status(500).json({ error: "Stripe session failed" });
   }
 };
+
 exports.stripeWebhook = async (req, res) => {
   const sig = req.headers["stripe-signature"];
-
   let event;
 
   try {

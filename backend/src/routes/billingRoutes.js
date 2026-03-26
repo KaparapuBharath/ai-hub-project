@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY || "");
+const Stripe = require("stripe");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 
 /* ================= AUTH MIDDLEWARE ================= */
 const protect = async (req, res, next) => {

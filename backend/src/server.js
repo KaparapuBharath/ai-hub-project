@@ -12,16 +12,22 @@ const conversationRoutes = require("./routes/conversationRoutes");
 
 const app = express();
 
-/* ================= CORS ================= */
+/* ================= CORS (FIXED) ================= */
 app.use(
   cors({
-    origin: true,
+    origin: [
+      "https://ai-hub-project-production.up.railway.app"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
 
 /* ================= STRIPE WEBHOOK ================= */
-app.use("/api/billing/webhook", express.raw({ type: "application/json" }));
+app.use(
+  "/api/billing/webhook",
+  express.raw({ type: "application/json" })
+);
 
 /* ================= JSON PARSER ================= */
 app.use(express.json());
@@ -41,6 +47,11 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/billing", billingRoutes);
 
+/* ================= HEALTH CHECK ================= */
+app.get("/health", (req, res) => {
+  res.send("AI Hub Backend Running 🚀");
+});
+
 /* ================= FRONTEND ================= */
 const __dirnamePath = path.resolve();
 
@@ -48,11 +59,6 @@ app.use(express.static(path.join(__dirnamePath, "frontend/dist")));
 
 app.get(/.*/, (req, res) => {
   res.sendFile(path.join(__dirnamePath, "frontend/dist/index.html"));
-});
-
-/* ================= HEALTH CHECK ================= */
-app.get("/health", (req, res) => {
-  res.send("AI Hub Backend Running 🚀");
 });
 
 /* ================= DATABASE ================= */
