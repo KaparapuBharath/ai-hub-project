@@ -65,8 +65,18 @@ router.post(
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
 
-      const userId = session.metadata?.userId;
-      const plan = session.metadata?.plan;
+      // 🔥 FIX: handle metadata properly for subscriptions
+      const userId =
+        session.metadata?.userId ||
+        session.subscription_details?.metadata?.userId;
+
+      const plan =
+        session.metadata?.plan ||
+        session.subscription_details?.metadata?.plan;
+
+      // 🔍 Debug (safe)
+      console.log("Webhook userId:", userId);
+      console.log("Webhook plan:", plan);
 
       if (userId && plan) {
         try {
@@ -82,6 +92,8 @@ router.post(
         } catch (dbError) {
           console.error("Database update failed:", dbError.message);
         }
+      } else {
+        console.error("❌ Metadata missing in webhook");
       }
     }
 
