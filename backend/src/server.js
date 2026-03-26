@@ -12,7 +12,7 @@ const conversationRoutes = require("./routes/conversationRoutes");
 
 const app = express();
 
-/* ================= FORCE CORS (FINAL FIX) ================= */
+/* ================= FORCE CORS (FINAL FINAL FIX) ================= */
 app.use((req, res, next) => {
   res.header(
     "Access-Control-Allow-Origin",
@@ -26,6 +26,9 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, OPTIONS"
   );
+
+  // ✅ THIS LINE FIXES YOUR ERROR
+  res.header("Access-Control-Allow-Credentials", "true");
 
   if (req.method === "OPTIONS") {
     return res.sendStatus(200);
