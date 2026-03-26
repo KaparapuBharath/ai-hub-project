@@ -12,7 +12,29 @@ const conversationRoutes = require("./routes/conversationRoutes");
 
 const app = express();
 
-/* ================= CORS (FIXED) ================= */
+/* ================= FORCE CORS (FINAL FIX) ================= */
+app.use((req, res, next) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://ai-hub-project-production.up.railway.app"
+  );
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
+
+/* ================= CORS ================= */
 app.use(
   cors({
     origin: [
@@ -59,6 +81,15 @@ app.use(express.static(path.join(__dirnamePath, "frontend/dist")));
 
 app.get(/.*/, (req, res) => {
   res.sendFile(path.join(__dirnamePath, "frontend/dist/index.html"));
+});
+
+/* ================= GLOBAL ERROR HANDLER ================= */
+app.use((err, req, res, next) => {
+  console.error("🔥 GLOBAL ERROR:", err);
+  res.status(500).json({
+    message: "Server Error",
+    error: err.message,
+  });
 });
 
 /* ================= DATABASE ================= */
