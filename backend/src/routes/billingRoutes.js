@@ -4,6 +4,10 @@ const Stripe = require("stripe");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
+/* ================= STRIPE INIT (SAFE) ================= */
+if (!process.env.STRIPE_SECRET_KEY) {
+  console.error("❌ STRIPE_SECRET_KEY is missing in ENV");
+}
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 
 /* ================= AUTH MIDDLEWARE ================= */
@@ -43,6 +47,11 @@ router.post(
     let event;
 
     try {
+      if (!process.env.STRIPE_WEBHOOK_SECRET) {
+        console.error("❌ STRIPE_WEBHOOK_SECRET missing");
+        return res.status(500).send("Webhook secret not configured");
+      }
+
       event = stripe.webhooks.constructEvent(
         req.body,
         sig,
@@ -118,8 +127,13 @@ router.post("/checkout", protect, async (req, res) => {
     }
 
     if (!process.env.STRIPE_SECRET_KEY) {
-      console.error("Stripe secret key missing");
+      console.error("❌ Stripe secret key missing");
       return res.status(500).json({ message: "Stripe not configured" });
+    }
+
+    if (!process.env.CLIENT_URL) {
+      console.error("❌ CLIENT_URL missing");
+      return res.status(500).json({ message: "Client URL not configured" });
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -150,7 +164,7 @@ router.post("/checkout", protect, async (req, res) => {
     res.json({ url: session.url });
 
   } catch (error) {
-    console.error("Stripe checkout error:", error);
+    console.error("🔥 Stripe checkout error FULL:", error);
     res.status(500).json({
       message: "Checkout session failed",
       error: error.message,
