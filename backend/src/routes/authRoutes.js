@@ -1,5 +1,10 @@
 const router = require("express").Router();
-const { register, login, logout, changePassword } = require("../controllers/authController");
+const {
+  register,
+  login,
+  logout,
+  changePassword,
+} = require("../controllers/authController");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 
@@ -29,10 +34,9 @@ router.put("/change-password", async (req, res) => {
     req.userId = decoded.id;
 
     return changePassword(req, res);
-
   } catch (err) {
     console.error("Change password error:", err.message);
-    res.status(401).json({ message: "Unauthorized" });
+    return res.status(401).json({ message: "Unauthorized" });
   }
 });
 
@@ -59,11 +63,10 @@ router.get("/me", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json(user);
-
+    return res.json(user);
   } catch (err) {
     console.error("GET /me error:", err.message);
-    res.status(401).json({ message: "Unauthorized" });
+    return res.status(401).json({ message: "Unauthorized" });
   }
 });
 
@@ -86,11 +89,10 @@ router.delete("/delete", async (req, res) => {
 
     await User.findByIdAndDelete(decoded.id);
 
-    res.json({ message: "Account deleted successfully" });
-
+    return res.json({ message: "Account deleted successfully" });
   } catch (err) {
     console.error("Delete account error:", err.message);
-    res.status(500).json({ message: "Failed to delete account" });
+    return res.status(500).json({ message: "Failed to delete account" });
   }
 });
 

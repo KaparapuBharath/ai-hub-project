@@ -1,9 +1,12 @@
 import axios from "axios";
 
+const BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://ai-hub-project-production-32fa.up.railway.app";
+
+/* ================= AXIOS INSTANCE ================= */
 const api = axios.create({
-  baseURL:
-    import.meta.env.VITE_API_URL ||
-    "https://ai-hub-project-production-32fa.up.railway.app/api",
+  baseURL: BASE_URL + "/api",
   withCredentials: true,
 });
 
