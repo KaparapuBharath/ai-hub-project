@@ -12,7 +12,6 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
 
-    // 🔥 ensure headers object exists
     config.headers = config.headers || {};
 
     if (token) {
@@ -23,6 +22,14 @@ api.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
+/* ================= FIX WRONG URL (IMPORTANT) ================= */
+api.interceptors.request.use((config) => {
+  if (!config.url.startsWith("/")) {
+    config.url = "/" + config.url;
+  }
+  return config;
+});
 
 /* ================= SMART LOGOUT ================= */
 api.interceptors.response.use(
