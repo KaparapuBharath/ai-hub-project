@@ -10,6 +10,29 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 
+/* ================= FORCE CORS FOR BILLING (FINAL FIX) ================= */
+router.use((req, res, next) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://ai-hub-project-production.up.railway.app"
+  );
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+  res.header("Access-Control-Allow-Credentials", "true");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
+
 /* ================= AUTH MIDDLEWARE ================= */
 const protect = async (req, res, next) => {
   try {
