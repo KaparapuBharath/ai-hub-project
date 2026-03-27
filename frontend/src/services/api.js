@@ -28,9 +28,24 @@ api.interceptors.request.use(
 
 /* ================= FIX WRONG URL (IMPORTANT) ================= */
 api.interceptors.request.use((config) => {
-  if (!config.url.startsWith("/")) {
-    config.url = "/" + config.url;
+  let url = config.url || "";
+
+  // Ensure leading slash
+  if (!url.startsWith("/")) {
+    url = "/" + url;
   }
+
+  // 🔥 REMOVE duplicate /api
+  url = url.replace(/^\/api\/api\/api/, "/api");
+  url = url.replace(/^\/api\/api/, "/api");
+
+  // 🔥 If baseURL already has /api, remove from url
+  if (url.startsWith("/api")) {
+    url = url.replace("/api", "");
+  }
+
+  config.url = url;
+
   return config;
 });
 
